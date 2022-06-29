@@ -18,6 +18,7 @@ class HumanEval(App):
 
 class EvalBar(Widget):
     current_eval = NumericProperty(0)
+    target_eval = NumericProperty(0)
     wiggle = NumericProperty(0)
     wiggle_height = dp(5)
     color = Color(rgb=(1, 1, 1))
@@ -27,6 +28,8 @@ class EvalBar(Widget):
     def update(self, dt):
         self.wiggle = self.wiggle_height * math.sin(self.elapsed_time)
         self.elapsed_time += 2 * dt
+        if self.current_eval != self.target_eval:
+            self.current_eval += (self.target_eval-self.current_eval) / 10
 
     # def draw_bar(self, eval_out_of_100):
     #     half_height = self.height / 2
@@ -37,7 +40,7 @@ class EvalBar(Widget):
     #         self.rect = Rectangle(pos=self.pos, size=(self.width, target_height))
 
     def set_eval(self, new_eval_out_of_100):
-        self.current_eval = new_eval_out_of_100
+        self.target_eval = new_eval_out_of_100
 
 
 class EvalButtonGrid(GridLayout):
