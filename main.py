@@ -27,7 +27,7 @@ class EvalBar(Widget):
 
     def update(self, dt):
         self.wiggle = self.wiggle_height * math.sin(self.elapsed_time)
-        self.elapsed_time += 2 * dt
+        self.elapsed_time += 2.5*dt
         if self.current_eval != self.target_eval:
             self.current_eval += (self.target_eval-self.current_eval) / 10
 
