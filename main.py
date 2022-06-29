@@ -53,7 +53,7 @@ class EvalButtonGrid(GridLayout):
     def set_player_color(self, color_name):
         if color_name != "White":
             self.direction = -1
-        self.evaluations = [(f"{color_name} is absolutely crushing", .9), (f"{color_name} is winning", .75),
+        self.evaluations = [(f"{color_name} is absolutely crushing", .99), (f"{color_name} is winning", .75),
                             (f"{color_name} is much better", .6), (f"{color_name} is slightly better", .4),
                             (f"{color_name} is pulling", .25), (f"{color_name} is okay", .1)]
         for evaluation in self.evaluations:
