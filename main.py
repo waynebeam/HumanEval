@@ -42,7 +42,7 @@ class EvalBar(Widget):
 
 class EvalButtonGrid(GridLayout):
     player_color = StringProperty()
-    button_bindings = {Button: (str, int)}
+    button_bindings = {Button: (str, float)}
     evaluations = []
     direction = 1
     eval_bar = ObjectProperty(EvalBar)
@@ -50,11 +50,11 @@ class EvalButtonGrid(GridLayout):
     def set_player_color(self, color_name):
         if color_name != "White":
             self.direction = -1
-        self.evaluations = [(f"{color_name} is absolutely crushing", 98), (f"{color_name} is winning", 80),
-                            (f"{color_name} is much better", 60), (f"{color_name} is slightly better", 40),
-                            (f"{color_name} is pulling", 20), (f"{color_name} is okay", 10)]
+        self.evaluations = [(f"{color_name} is absolutely crushing", .9), (f"{color_name} is winning", .75),
+                            (f"{color_name} is much better", .6), (f"{color_name} is slightly better", .4),
+                            (f"{color_name} is pulling", .25), (f"{color_name} is okay", .1)]
         for evaluation in self.evaluations:
-            btn = Button(text=evaluation[0])
+            btn = Button(text=evaluation[0], font_size=dp(20))
             self.button_bindings[btn] = evaluation
             btn.bind(on_release=self.set_evaluation)
             self.add_widget(btn)
