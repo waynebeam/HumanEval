@@ -1,7 +1,7 @@
 import math
 
 from kivy.app import App
-from kivy.graphics import Color, Rectangle, Line
+from kivy.graphics import Color, Rectangle, Line, Ellipse
 from kivy.metrics import dp
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 from kivy.uix.button import Button
@@ -19,6 +19,7 @@ class HumanEval(App):
 class EvalBar(Widget):
     current_eval = NumericProperty(0)
     target_eval = NumericProperty(0)
+    size_property = ObjectProperty()
     wiggle = NumericProperty(0)
     wiggle_height = dp(5)
     color = Color(rgb=(1, 1, 1))
@@ -26,6 +27,22 @@ class EvalBar(Widget):
     elapsed_time = 0
     previous_sin_value = 0
     previous_direction_increasing = False
+    list_of_bubbles = []
+    bar_size = (0, 0)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas:
+            Color(rgb=(1, 1, 1))
+            self.rect = Rectangle(pos=self.pos, size=self.calculate_bar_size())
+
+    def calculate_bar_size(self):
+        self.bar_size = self.width, (self.height / 2) + (self.height / 2 * self.current_eval) + self.wiggle
+        return self.bar_size
+
+    def update_rect(self):
+        self.rect.pos = self.pos
+        self.rect.size = self.bar_size
 
     def calculate_wiggle(self, dt):
 
@@ -33,7 +50,7 @@ class EvalBar(Widget):
         current_direction_increasing = abs(current_sin_value) > abs(self.previous_sin_value)
 
         if self.previous_direction_increasing and not current_direction_increasing:
-            print ("topped out")
+            self.spray_bubbles(dt)
 
         self.wiggle = self.wiggle_height * current_sin_value
         self.elapsed_time += 2.5 * dt
@@ -43,12 +60,18 @@ class EvalBar(Widget):
         self.previous_sin_value = current_sin_value
         self.previous_direction_increasing = current_direction_increasing
 
-    def check_wiggle_status(self):
-        pass
+    def spray_bubbles(self, dt):
+
+        bubble = Bubble(self.target_eval,self, (self.x, self.y + self.bar_size[1]))
+        self.add_widget(bubble)
+        self.list_of_bubbles.append(bubble)
 
     def update(self, dt):
         self.calculate_wiggle(dt)
-
+        self.calculate_bar_size()
+        self.update_rect()
+        for bubble in self.list_of_bubbles:
+            bubble.update(dt)
 
     # def draw_bar(self, eval_out_of_100):
     #     half_height = self.height / 2
@@ -60,6 +83,39 @@ class EvalBar(Widget):
 
     def set_eval(self, new_eval_out_of_100):
         self.target_eval = new_eval_out_of_100
+
+
+class Bubble(Widget):
+    speed = 5
+    direction = 1
+    shrink_speed = 100
+    eval_bar = EvalBar
+
+    def __init__(self, eval,eval_bar, pos, **kwargs):
+        super().__init__(**kwargs)
+        self.pos = pos
+        self.bind(pos=self.update_ellipse_pos)
+        self.eval = eval
+        self.eval_bar = eval_bar
+        with self.canvas:
+            if eval >= 0:
+                Color(rgb=(1, 1, 1))
+            else:
+                Color(rgb=(0, 0, 0))
+                self.direction = -1
+            self.ellipse = Ellipse(pos=(self.x, self.y), size=self.size)
+
+    def update(self, dt):
+        self.y += self.speed * self.direction
+        self.size[0] -= self.shrink_speed * dt
+        self.size[1] -= self.shrink_speed * dt
+        if self.size[0] <= 0:
+            self.eval_bar.list_of_bubbles.remove(self)
+            self.eval_bar.remove_widget(self)
+
+    def update_ellipse_pos(self, obj, value):
+        self.ellipse.pos = (self.x, self.y)
+        self.ellipse.size = self.size
 
 
 class EvalButtonGrid(GridLayout):
