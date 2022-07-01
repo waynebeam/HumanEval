@@ -1,4 +1,5 @@
 import math
+from random import random
 
 from kivy.app import App
 from kivy.graphics import Color, Rectangle, Line, Ellipse
@@ -50,7 +51,12 @@ class EvalBar(Widget):
         current_direction_increasing = abs(current_sin_value) > abs(self.previous_sin_value)
 
         if self.previous_direction_increasing and not current_direction_increasing:
-            self.spray_bubbles(dt)
+            if current_sin_value > 0 and self.target_eval >0:
+                for i in range(20):
+                    self.spray_bubbles(dt)
+            elif current_sin_value < 0 and self.target_eval < 0:
+                for i in range(20):
+                    self.spray_bubbles(dt)
 
         self.wiggle = self.wiggle_height * current_sin_value
         self.elapsed_time += 2.5 * dt
@@ -62,7 +68,7 @@ class EvalBar(Widget):
 
     def spray_bubbles(self, dt):
 
-        bubble = Bubble(self.target_eval,self, (self.x, self.y + self.bar_size[1]))
+        bubble = Bubble(self.target_eval,self, (self.x+(random()*self.width/2), self.y + self.bar_size[1]))
         self.add_widget(bubble)
         self.list_of_bubbles.append(bubble)
 
@@ -86,9 +92,9 @@ class EvalBar(Widget):
 
 
 class Bubble(Widget):
-    speed = 5
+    speed = 3
     direction = 1
-    shrink_speed = 100
+    shrink_speed = 70
     eval_bar = EvalBar
 
     def __init__(self, eval,eval_bar, pos, **kwargs):
@@ -97,6 +103,9 @@ class Bubble(Widget):
         self.bind(pos=self.update_ellipse_pos)
         self.eval = eval
         self.eval_bar = eval_bar
+        self.shrink_speed += (self.shrink_speed * random())
+        self.speed += (self.speed * random())
+        self.size = (dp(30), dp(30))
         with self.canvas:
             if eval >= 0:
                 Color(rgb=(1, 1, 1))
@@ -107,6 +116,8 @@ class Bubble(Widget):
 
     def update(self, dt):
         self.y += self.speed * self.direction
+        self.x += self.speed * dt
+
         self.size[0] -= self.shrink_speed * dt
         self.size[1] -= self.shrink_speed * dt
         if self.size[0] <= 0:
@@ -116,6 +127,7 @@ class Bubble(Widget):
     def update_ellipse_pos(self, obj, value):
         self.ellipse.pos = (self.x, self.y)
         self.ellipse.size = self.size
+
 
 
 class EvalButtonGrid(GridLayout):
