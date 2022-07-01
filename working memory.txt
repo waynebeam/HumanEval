@@ -1,0 +1,5 @@
+Need to:
+Make the bubbles spray instead of one at a time
+Change color of bubble shot based on top or bottom of sin wave (not just direction change)
+Make bubbles relative to the center
+add some random speed to bubbles
