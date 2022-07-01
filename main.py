@@ -24,12 +24,31 @@ class EvalBar(Widget):
     color = Color(rgb=(1, 1, 1))
     rect = Rectangle
     elapsed_time = 0
+    previous_sin_value = 0
+    previous_direction_increasing = False
+
+    def calculate_wiggle(self, dt):
+
+        current_sin_value = math.sin(self.elapsed_time)
+        current_direction_increasing = abs(current_sin_value) > abs(self.previous_sin_value)
+
+        if self.previous_direction_increasing and not current_direction_increasing:
+            print ("topped out")
+
+        self.wiggle = self.wiggle_height * current_sin_value
+        self.elapsed_time += 2.5 * dt
+        if self.current_eval != self.target_eval:
+            self.current_eval += (self.target_eval - self.current_eval) / 10
+
+        self.previous_sin_value = current_sin_value
+        self.previous_direction_increasing = current_direction_increasing
+
+    def check_wiggle_status(self):
+        pass
 
     def update(self, dt):
-        self.wiggle = self.wiggle_height * math.sin(self.elapsed_time)
-        self.elapsed_time += 2.5*dt
-        if self.current_eval != self.target_eval:
-            self.current_eval += (self.target_eval-self.current_eval) / 10
+        self.calculate_wiggle(dt)
+
 
     # def draw_bar(self, eval_out_of_100):
     #     half_height = self.height / 2
