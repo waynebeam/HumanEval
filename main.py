@@ -92,9 +92,9 @@ class EvalBar(Widget):
 
 
 class Bubble(Widget):
-    speed = 3
+    speed = 2
     direction = 1
-    shrink_speed = 70
+    shrink_speed = 20
     eval_bar = EvalBar
 
     def __init__(self, eval,eval_bar, pos, **kwargs):
@@ -115,11 +115,15 @@ class Bubble(Widget):
             self.ellipse = Ellipse(pos=(self.x, self.y), size=self.size)
 
     def update(self, dt):
-        self.y += self.speed * self.direction
-        self.x += self.speed * dt
 
+        old_width = self.width
         self.size[0] -= self.shrink_speed * dt
         self.size[1] -= self.shrink_speed * dt
+        size_change_offset = old_width-self.width
+
+        self.y += self.speed * self.direction
+        self.x += self.speed * dt +size_change_offset
+
         if self.size[0] <= 0:
             self.eval_bar.list_of_bubbles.remove(self)
             self.eval_bar.remove_widget(self)
