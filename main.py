@@ -30,6 +30,9 @@ class EvalBar(Widget):
     previous_direction_increasing = False
     list_of_bubbles = []
     bar_size = (0, 0)
+    white_eval_label = ObjectProperty(Label)
+    black_eval_label = ObjectProperty(Label)
+    eval_to_symbol = {}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -50,13 +53,13 @@ class EvalBar(Widget):
         current_sin_value = math.sin(self.elapsed_time)
         current_direction_increasing = abs(current_sin_value) > abs(self.previous_sin_value)
 
-        if self.previous_direction_increasing and not current_direction_increasing:
-            if current_sin_value > 0 and self.target_eval >0:
-                for i in range(20):
-                    self.spray_bubbles(dt)
-            elif current_sin_value < 0 and self.target_eval < 0:
-                for i in range(20):
-                    self.spray_bubbles(dt)
+        # if self.previous_direction_increasing and not current_direction_increasing:
+        #     if current_sin_value > 0 and self.target_eval >0:
+        #         for i in range(20):
+        #             self.spray_bubbles(dt)
+        #     elif current_sin_value < 0 and self.target_eval < 0:
+        #         for i in range(20):
+        #             self.spray_bubbles(dt)
 
         self.wiggle = self.wiggle_height * current_sin_value
         self.elapsed_time += 2.5 * dt
@@ -68,14 +71,24 @@ class EvalBar(Widget):
 
     def spray_bubbles(self, dt):
 
-        bubble = Bubble(self.target_eval,self, (self.x+(random()*self.width/2), self.y + self.bar_size[1]))
+        bubble = Bubble(self.target_eval, self, (self.x + (random() * self.width / 2), self.y + self.bar_size[1]))
         self.add_widget(bubble)
         self.list_of_bubbles.append(bubble)
+
+    def update_eval_labels(self):
+        if self.target_eval < 0:
+            self.white_eval_label.text = ""
+            self.black_eval_label.text = self.eval_to_symbol[self.target_eval]
+            return
+        if self.target_eval > 0:
+            self.black_eval_label.text = ""
+            self.white_eval_label.text = self.eval_to_symbol[self.target_eval]
 
     def update(self, dt):
         self.calculate_wiggle(dt)
         self.calculate_bar_size()
         self.update_rect()
+        self.update_eval_labels()
         for bubble in self.list_of_bubbles:
             bubble.update(dt)
 
@@ -97,7 +110,7 @@ class Bubble(Widget):
     shrink_speed = 20
     eval_bar = EvalBar
 
-    def __init__(self, eval,eval_bar, pos, **kwargs):
+    def __init__(self, eval, eval_bar, pos, **kwargs):
         super().__init__(**kwargs)
         self.pos = pos
         self.bind(pos=self.update_ellipse_pos)
@@ -119,10 +132,10 @@ class Bubble(Widget):
         old_width = self.width
         self.size[0] -= self.shrink_speed * dt
         self.size[1] -= self.shrink_speed * dt
-        size_change_offset = old_width-self.width
+        size_change_offset = old_width - self.width
 
         self.y += self.speed * self.direction
-        self.x += self.speed * dt +size_change_offset
+        self.x += self.speed * dt + size_change_offset
 
         if self.size[0] <= 0:
             self.eval_bar.list_of_bubbles.remove(self)
@@ -132,6 +145,28 @@ class Bubble(Widget):
         self.ellipse.pos = (self.x, self.y)
         self.ellipse.size = self.size
 
+
+def setup_eval_to_word_pairs(color_name: str, eval_bar: EvalBar):
+    evaluation_to_words = [(f"{color_name} is absolutely crushing", .99), (f"{color_name} is winning", .75),
+                           (f"{color_name} is much better", .6), (f"{color_name} is slightly better", .4),
+                           (f"{color_name} is pulling", .25), (f"{color_name} is okay", .1)]
+
+    if color_name == "White":
+        eval_bar.eval_to_symbol[.99] = "!!"
+        eval_bar.eval_to_symbol[.75] = "+-"
+        eval_bar.eval_to_symbol[.6] = "+ \n-"
+        eval_bar.eval_to_symbol[.4] = "+\n="
+        eval_bar.eval_to_symbol[.25] = "+\n="
+        eval_bar.eval_to_symbol[.1] = "="
+    if color_name == "Black":
+        eval_bar.eval_to_symbol[-.99] = "!!"
+        eval_bar.eval_to_symbol[-.75] = "-+"
+        eval_bar.eval_to_symbol[-.6] = "- \n+"
+        eval_bar.eval_to_symbol[-.4] = "-\n="
+        eval_bar.eval_to_symbol[-.25] = "-\n="
+        eval_bar.eval_to_symbol[-.1] = "="
+
+    return evaluation_to_words
 
 
 class EvalButtonGrid(GridLayout):
@@ -144,9 +179,7 @@ class EvalButtonGrid(GridLayout):
     def set_player_color(self, color_name):
         if color_name != "White":
             self.direction = -1
-        self.evaluations = [(f"{color_name} is absolutely crushing", .99), (f"{color_name} is winning", .75),
-                            (f"{color_name} is much better", .6), (f"{color_name} is slightly better", .4),
-                            (f"{color_name} is pulling", .25), (f"{color_name} is okay", .1)]
+        self.evaluations = setup_eval_to_word_pairs(color_name, self.eval_bar)
         for evaluation in self.evaluations:
             btn = Button(text=evaluation[0], font_size=dp(20))
             self.button_bindings[btn] = evaluation

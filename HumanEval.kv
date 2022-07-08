@@ -13,7 +13,10 @@ MainScreen:
             width: "20dp"
         EvalBar:
             id: eval_bar
+            white_eval_label: white_label
+            black_eval_label: black_label
             size_hint_x: None
+
             canvas.before:
                 Color:
                     rgb: 0, 0, 0
@@ -27,6 +30,20 @@ MainScreen:
                 Line:
                     width: 4
                     points: self.x, self.height / 2, self.x + self.width, self.height / 2
+            Label:
+                id: white_label
+                font_size: "20dp"
+                x: eval_bar.x
+                y: eval_bar.height * .85
+                text: "test white"
+                color: (1,1,1,1)
+            Label:
+                id: black_label
+                font_size: "20dp"
+                x: eval_bar.x
+                y: eval_bar.y
+                text: "test black"
+                color: (0,0,0,1)
         Widget:
             size_hint_x: None
             width: "20dp"
