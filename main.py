@@ -83,14 +83,17 @@ class EvalBar(Widget):
         if self.target_eval > 0:
             self.black_eval_label.text = ""
             self.white_eval_label.text = self.eval_to_symbol[self.target_eval]
+        if self.target_eval == 0:
+            self.black_eval_label.text = ""
+            self.white_eval_label.text = ""
 
     def update(self, dt):
         self.calculate_wiggle(dt)
         self.calculate_bar_size()
         self.update_rect()
         self.update_eval_labels()
-        for bubble in self.list_of_bubbles:
-            bubble.update(dt)
+        # for bubble in self.list_of_bubbles:
+        #     bubble.update(dt)
 
     # def draw_bar(self, eval_out_of_100):
     #     half_height = self.height / 2
@@ -149,7 +152,7 @@ class Bubble(Widget):
 class EvalButtonGrid(GridLayout):
     player_color = StringProperty()
     button_bindings = {Button: (str, float, str)}
-    evaluations = []
+    evaluations = [str, float, str]
     direction = 1
     eval_bar = ObjectProperty(EvalBar)
 
