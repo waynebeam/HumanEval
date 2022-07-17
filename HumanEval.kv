@@ -48,8 +48,9 @@ MainScreen:
         BoxLayout:
             orientation: "vertical"
             EvalButtonGrid:
+                id: white_button_grid
                 cols: 2
-                player_color: self.set_player_color("White")
+                player_color: self.setup_buttons("White")
                 eval_bar: eval_bar
             BoxLayout:
                 size_hint_y: .2
@@ -62,7 +63,8 @@ MainScreen:
                     text: "Redo"
             EvalButtonGrid:
                 cols: 2
-                player_color: self.set_player_color("Black")
+                id: black_button_grid
+                player_color: self.setup_buttons("Black")
                 eval_bar: eval_bar
 
 

@@ -152,12 +152,13 @@ class Bubble(Widget):
 class EvalButtonGrid(GridLayout):
     player_color = StringProperty()
     button_bindings = {Button: (str, float, str)}
-    evaluations = [str, float, str]
+    evaluation_words_value_symbol = [(str, float, str)]
     direction = 1
     eval_bar = ObjectProperty(EvalBar)
 
     # noinspection PyStatementEffect
-    def set_player_color(self, color_name):
+
+    def setup_buttons(self, color_name) -> StringProperty:
         evaluation_to_words = [str, float, str]
         if color_name == "White":
             self.direction = 1
@@ -174,8 +175,8 @@ class EvalButtonGrid(GridLayout):
                                    (f"{color_name} is slightly better", -.4, "-="),
                                    (f"{color_name} is pulling", -.25, "-\n="), (f"{color_name} is okay", -.1, "=")]
 
-        self.evaluations = evaluation_to_words
-        for evaluation in self.evaluations:
+        self.evaluation_words_value_symbol = evaluation_to_words
+        for evaluation in self.evaluation_words_value_symbol:
             btn = Button(text=evaluation[0], font_size=dp(20))
             self.button_bindings[btn] = evaluation
             btn.bind(on_release=self.set_evaluation)
