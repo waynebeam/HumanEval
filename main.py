@@ -149,6 +149,24 @@ class Bubble(Widget):
         self.ellipse.size = self.size
 
 
+def setup_white_words_eval_symbol_array():
+    return [("White is absolutely crushing", .99, "!!"),
+            ("White is winning", .75, "+-"),
+            ("White is much better", .6, "+ \n-"),
+            ("White is slightly better", .4, "+="),
+            ("White is pulling", .25, "+\n="),
+            ("White is okay", .1, "=")]
+
+
+def setup_black_words_eval_symbol_array():
+    return [("Black is absolutely crushing", -.99, "-!!"),
+            ("Black is winning", -.75, "-+"),
+            ("Black is much better", -.6, "- \n+"),
+            ("Black is slightly better", -.4, "-="),
+            ("Black is pulling", -.25, "-\n="),
+            ("Black is okay", -.1, "=")]
+
+
 class EvalButtonGrid(GridLayout):
     player_color = StringProperty()
     button_bindings = {Button: (str, float, str)}
@@ -158,22 +176,14 @@ class EvalButtonGrid(GridLayout):
 
     # noinspection PyStatementEffect
 
-    def setup_buttons(self, color_name) -> StringProperty:
+    def setup_buttons(self, color_name):
         evaluation_to_words = [str, float, str]
         if color_name == "White":
             self.direction = 1
-            evaluation_to_words = [(f"{color_name} is absolutely crushing", .99, "!!"),
-                                   (f"{color_name} is winning", .75, "+-"),
-                                   (f"{color_name} is much better", .6, "+ \n-"),
-                                   (f"{color_name} is slightly better", .4, "+="),
-                                   (f"{color_name} is pulling", .25, "+\n="), (f"{color_name} is okay", .1, "=")]
+            evaluation_to_words = setup_white_words_eval_symbol_array()
         if color_name == "Black":
             self.direction = -1
-            evaluation_to_words = [(f"{color_name} is absolutely crushing", -.99, "-!!"),
-                                   (f"{color_name} is winning", -.75, "-+"),
-                                   (f"{color_name} is much better", -.6, "- \n+"),
-                                   (f"{color_name} is slightly better", -.4, "-="),
-                                   (f"{color_name} is pulling", -.25, "-\n="), (f"{color_name} is okay", -.1, "=")]
+            evaluation_to_words = setup_black_words_eval_symbol_array()
 
         self.evaluation_words_value_symbol = evaluation_to_words
         for evaluation in self.evaluation_words_value_symbol:
